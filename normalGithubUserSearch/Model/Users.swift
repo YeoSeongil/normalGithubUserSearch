@@ -5,8 +5,8 @@
 //  Created by 여성일 on 2/6/24.
 import Foundation
 
-// MARK: - Welcome
-class Users: Codable {
+// MARK: - Users
+struct Users: Decodable {
     let totalCount: Int
     let incompleteResults: Bool
     let items: [Item]
@@ -19,7 +19,7 @@ class Users: Codable {
 }
 
 // MARK: - Item
-class Item: Codable {
+struct Item: Decodable {
     let login: String
     let id: Int
     let nodeID: String
