@@ -6,3 +6,9 @@
 //
 
 import Foundation
+
+enum Constants {
+    enum API {
+        static let searchURL = "https://api.github.com/search/users?q"
+    }
+}
