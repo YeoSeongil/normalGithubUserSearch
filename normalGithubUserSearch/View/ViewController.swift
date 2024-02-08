@@ -6,10 +6,13 @@
 //
 
 import UIKit
+import RxSwift
+import RxCocoa
 
 class ViewController: UIViewController {
 
     let viewModel = ViewModel()
+    let disposeBag = DisposeBag()
     
     private lazy var searchTextField: UITextField = {
         let textField = UITextField()
@@ -38,8 +41,10 @@ class ViewController: UIViewController {
         // Do any additional setup after loading the view.
         setView()
         setConstraint()
-        viewModel.fetchData()
-        bind()
+        //viewModel.fetchData()
+        //bind()
+        viewModel.fetchDataRx()
+        bindRx()
     }
     
     private func setView() {
@@ -47,9 +52,9 @@ class ViewController: UIViewController {
         [searchTextField, serachResultCollectionView].forEach {
             self.view.addSubview($0)
         }
-        serachResultCollectionView.delegate = self
-        serachResultCollectionView.dataSource = self
-        searchTextField.delegate = self
+        //serachResultCollectionView.delegate = self
+        //serachResultCollectionView.dataSource = self
+        //searchTextField.delegate = self
     }
     
     private func setConstraint() {
@@ -86,24 +91,33 @@ class ViewController: UIViewController {
             }
         }
     }
+    
+    private func bindRx() {
+        serachResultCollectionView.rx.setDelegate(self).disposed(by: disposeBag)
+        viewModel.itemRx.bind(to: serachResultCollectionView.rx.items(cellIdentifier: "searchResultCollectionViewCell", cellType: searchResultCollectionViewCell.self)) { (row, item, cell) in
+            cell.configurationRx(item)
+        }.disposed(by: disposeBag)
+        
+        searchTextField.rx.text.subscribe(onNext: { text in
+            guard let text = text else { return }
+            self.viewModel.searchDataRx(text)
+        }).disposed(by:  disposeBag)
+    }
 }
 
-extension ViewController: UICollectionViewDataSource {
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return self.viewModel.item.count
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: searchResultCollectionViewCell.id, for: indexPath) as? searchResultCollectionViewCell else {
-            return UICollectionViewCell()
-        }
-        
-        let items = self.viewModel.item[indexPath.row]
-        cell.users = items
-        return cell
-    }
-    
-}
+//extension ViewController: UICollectionViewDataSource {
+//    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+//        return self.viewModel.item.count
+//    }
+//    
+//    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+//        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: searchResultCollectionViewCell.id, for: indexPath) as? searchResultCollectionViewCell else {
+//            return UICollectionViewCell()
+//        }
+//        return cell
+//    }
+//    
+//}
 
 extension ViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
@@ -112,10 +126,10 @@ extension ViewController: UICollectionViewDelegateFlowLayout {
         return CGSize(width: width, height: height)
     }
 }
-
-extension ViewController: UITextFieldDelegate {
-    func textFieldDidChangeSelection(_ textField: UITextField) {
-        guard let text = textField.text else { return }
-            viewModel.serachData(text)
-        }
-}
+//
+//extension ViewController: UITextFieldDelegate {
+//    func textFieldDidChangeSelection(_ textField: UITextField) {
+//        guard let text = textField.text else { return }
+//            viewModel.serachData(text)
+//        }
+//}
