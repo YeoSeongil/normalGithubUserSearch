@@ -75,4 +75,10 @@ class searchResultCollectionViewCell: UICollectionViewCell {
         self.userImageView.setImageKingfisher(with: users.avatarURL)
         self.nameLabel.text = users.login
     }
+    
+    func configurationRx(_ users: Item) {
+       //self.userImageView.image = UIImage(named: users.items[0].avatarURL)
+        self.userImageView.setImageKingfisher(with: users.avatarURL)
+        self.nameLabel.text = users.login
+    }
 }
